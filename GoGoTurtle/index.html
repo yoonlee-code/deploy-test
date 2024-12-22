@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoGoTurtle Game</title>
+    <style>
+        /* ---------------------- Reset and Base Styles ---------------------- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: rgb(234, 255, 0);
+            overflow-y: scroll;
+            position: relative;
+            min-height: 100vh;
+            cursor: none; /* Hide the default cursor */
+        }
+
+        /* ------------------------- Custom Cursor Styles ------------------------- */
+        .custom-cursor {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 32px; /* Adjust size as needed */
+            height: 32px; /* Adjust size as needed */
+            pointer-events: none; /* Allow clicks to pass through */
+            background-image: url('mouse.png'); /* Path to your cursor image */
+            background-size: contain;
+            background-repeat: no-repeat;
+            transform: translate(-50%, -50%); /* Center the image on the cursor */
+            z-index: 10000; /* Ensure it's on top of all other elements */
+        }
+
+        /* --------------------------- Header Styles --------------------------- */
+        header {
+            display: flex;
+            align-items: center;
+            background-color: rgba(43, 151, 43, 0.75);
+            padding: 10px;
+            color: rgb(77, 255, 0);
+            position: relative;
+            z-index: 1003; /* Ensure header is above ads */
+        }
+
+        .logo {
+            flex: 1;
+            font-size: 1.5em;
+            font-weight: bold;
+            display: flex;
+            align-items: center; /* Align image and text vertically */
+        }
+
+        .logo img.logo-image {
+            width: 50px; /* Increased size from 40px to 50px */
+            height: auto;
+            margin-right: 10px; /* Space between image and text */
+        }
+
+        .nav {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: rgb(1, 0, 61);
+            padding: 5px 10px;
+            background-color: rgba(76, 175, 80, 0.75);
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .nav a:hover {
+            background-color: rgba(76, 175, 80, 1);
+        }
+
+        /* ------------------------- Main Banner Styles ------------------------- */
+        .main-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: rgba(195, 230, 195, 0.75);
+            padding: 10px;
+            flex-wrap: wrap; /* Allows wrapping on smaller screens */
+            position: relative;
+            z-index: 1000;
+        }
+
+        /* Container for Multiple Banners */
+        .banners {
+            display: flex;
+            gap: 10px;
+            flex: 2; /* Adjusts space allocation */
+            justify-content: center; /* Centers banners if there's extra space */
+            flex-wrap: wrap; /* Allows banners to wrap on smaller screens */
+        }
+
+        .banner-container {
+            position: relative;
+            width: 30%; /* Each banner takes up 30% of the container */
+            min-width: 150px; /* Ensures minimum width on smaller screens */
+            height: 150px; /* Fixed height for banners */
+            overflow: hidden; /* Hide overflowed images */
+            border: 2px solid rgba(77, 255, 0, 0.5);
+            border-radius: 5px;
+        }
+
+        .banner-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            cursor: pointer;
+        }
+
+        .banner-container img.active {
+            opacity: 1;
+        }
+
+        /* Hover Effects for Banners */
+        .banner-container img:hover {
+            transform: scale(1.05);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        /* ------------------------- Login Box Styles ------------------------- */
+        .login-box {
+            width: 200px;
+            background-color: rgba(43, 43, 43, 0.9);
+            color: white;
+            padding: 10px;
+            text-align: center;
+            border-radius: 5px;
+            flex: 1; /* Adjusts space allocation */
+            min-width: 200px; /* Ensures minimum width on smaller screens */
+            margin-top: 10px; /* Adds spacing when wrapping occurs */
+            z-index: 1003; /* Ensure login box is above ads */
+            position: relative;
+        }
+
+        .login-box h3 {
+            margin-bottom: 10px;
+        }
+
+        .login-box form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .login-box input {
+            padding: 5px;
+            font-size: 1em;
+            border: 1px solid #aaa;
+            border-radius: 3px;
+            width: 90%;
+            margin: 0 auto;
+        }
+
+        .login-box button {
+            padding: 5px 10px;
+            font-size: 1em;
+            background-color: rgba(76, 175, 80, 0.9);
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .login-box button:hover {
+            background-color: rgba(76, 175, 80, 1);
+        }
+
+        /* ------------------------- Game Section Styles ------------------------- */
+        .game {
+            background-color: rgba(0, 0, 0, 0.75);
+            padding: 10px;
+            text-align: center;
+            color: white;
+            font-size: 2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 1004; /* Ensure game is below ads */
+        }
+
+        .game img {
+            width: 50%; /* Adjust as needed */
+            height: auto;
+            object-fit: contain; /* Ensures the full image is shown */
+            pointer-events: none; /* Ensures image doesn't capture click events */
+        }
+
+        /* "Click to Play" Button Styles */
+        .game-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 10px 20px;
+            font-size: 1.2em;
+            background-color: rgba(76, 175, 80, 0.9);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            z-index: 1006; /* Ensure button is above all */
+        }
+
+        .game-button:hover {
+            background-color: rgba(76, 175, 80, 1);
+        }
+
+        .game-button:focus {
+            outline: 2px solid rgba(77, 255, 0, 0.7);
+            outline-offset: 2px;
+        }
+
+        /* ---------------------- Information Sections Styles ---------------------- */
+        .info {
+            display: flex;
+            gap: 10px;
+            padding: 10px;
+            flex-wrap: nowrap; /* Prevents wrapping to keep boxes side by side */
+            justify-content: center; /* Centers the content horizontally */
+            max-width: 900px; /* Increased max-width for wider boxes */
+            margin: 0 auto; /* Centers the container within its parent */
+            position: relative;
+            z-index: 998;
+        }
+
+        .info .announcements,
+        .info .events {
+            background-color: rgba(213, 250, 213, 0.458);
+            padding: 0;
+            max-height: 300px;
+            border: none; /* Removed border to eliminate unwanted lines */
+            min-width: 250px; /* Ensures minimum width on smaller screens */
+            width: 50%; /* Increased from 45% to 50% to make them wider */
+            overflow: hidden; /* Prevents parent overflow */
+            border-radius: 5px; /* Added border-radius for better aesthetics */
+            box-shadow: 0 0 5px rgba(0,0,0,0.5); /* Added subtle shadow */
+        }
+
+        .info .announcements strong,
+        .info .events strong {
+            display: block;
+            position: sticky;
+            top: 0;
+            background-color: rgba(65, 173, 65, 0.9);
+            padding: 10px;
+            border-bottom: 1px solid #aaa;
+            z-index: 1;
+            border-radius: 5px 5px 0 0; /* Rounded top corners */
+        }
+
+        .info .announcements .announcements-content,
+        .info .events .events-content {
+            padding: 10px;
+            height: 80px; /* Ensure content exceeds this height */
+            overflow-y: auto;  /* Enables vertical scrollbar when content exceeds height */
+        }
+
+        /* Announcements Content Styling */
+        .info .announcements .announcements-content a {
+            color: rgb(1, 0, 61);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 5px;
+            transition: color 0.3s;
+        }
+
+        .info .announcements .announcements-content a:hover {
+            color: rgb(77, 255, 0);
+        }
+
+        /* Events Content Styling */
+        .info .events .events-content a {
+            color: rgb(1, 0, 61);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 5px;
+            transition: color 0.3s;
+        }
+
+        .info .events .events-content a:hover {
+            color: rgb(77, 255, 0);
+        }
+
+        /* ------------------------- Sponsors Section Styles ------------------------- */
+        .sponsors {
+            background-color: rgba(0, 0, 0, 0.75);
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: relative;
+            z-index: 997;
+        }
+
+        .sponsors strong {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .sponsors div {
+            display: flex;
+            justify-content: space-around;
+            font-size: 0.9em;
+            margin-top: 20px;
+            flex-wrap: wrap; /* Allows wrapping on smaller screens */
+        }
+
+        .sponsors div div {
+            margin: 5px 0; /* Adds spacing between sponsor names when wrapped */
+        }
+
+        /* ------------------------- Advertisement Containers ------------------------- */
+        .ads-container {
+            position: fixed;
+            top: 55%; /* Adjusted from 60% to 55% to position ads higher */
+            left: 20px; /* Increased left margin from 10px to 20px */
+            right: 20px; /* Increased right margin from 10px to 20px */
+            transform: translateY(-50%);
+            display: flex;
+            justify-content: space-between;
+            z-index: 1007; /* Increased to be above all other elements */
+            pointer-events: none; /* Allow clicks to pass through if necessary */
+        }
+
+        .ads-left,
+        .ads-right {
+            display: flex;
+            flex-direction: column;
+            gap: 15px; /* Increased gap from 10px to 15px for better spacing */
+            pointer-events: auto; /* Enable pointer events on child images */
+        }
+
+        .ads-left img,
+        .ads-right img {
+            width: 150px; /* Increased width from 100px to 150px */
+            height: 150px; /* Increased height from 100px to 150px */
+            object-fit: cover;
+            cursor: pointer;
+            border: 1px solid #fff; /* Optional: border for better visibility */
+            border-radius: 5px;
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            opacity: 1; /* Ensure all ads are visible */
+            animation: floatUpDown 4s ease-in-out infinite; /* Apply floating animation */
+        }
+
+        /* Define the floating animation */
+        @keyframes floatUpDown {
+            0% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-5px); /* Reduced from -10px to -5px */
+            }
+            100% {
+                transform: translateY(0);
+            }
+        }
+
+        /* Enhanced Hover Effects for Larger Ads */
+        .ads-left img:hover,
+        .ads-right img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(77, 255, 0, 0.7);
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+
+        /* Blink Animation */
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .blink {
+            animation: blink 0.5s ease-in-out;
+        }
+
+        /* ---------------------- JS Output Container Styles ---------------------- */
+        #jsOutputContainer {
+            text-align: center; /* Centers the text horizontally */
+            margin: 20px 0; /* Adds vertical spacing */
+            color: white; /* Ensures the text is visible against the background */
+        }
+
+        /* ------------------------- Responsive Adjustments ------------------------- */
+        @media (max-width: 768px) {
+            .ads-container {
+                display: none; /* Hide ads on smaller screens */
+            }
+
+            .banner-container {
+                width: 45%; /* Adjust banner width on smaller screens */
+            }
+
+            .login-box {
+                width: 100%; /* Takes full width on smaller screens */
+                margin-top: 20px; /* Adds spacing when stacked vertically */
+            }
+
+            .info {
+                flex-direction: column; /* Stack boxes vertically */
+                max-width: 100%; /* Remove max-width restriction */
+                align-items: center; /* Center items horizontally */
+            }
+
+            .info .announcements,
+            .info .events {
+                width: 100%; /* Full width on small screens */
+                max-width: 500px; /* Optional: limit width for better readability */
+            }
+
+            .sponsors div {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .game-overlay {
+                font-size: 1.2em; /* Adjust overlay text size on smaller screens */
+            }
+        }
+    </style>
+    <!-- Include p5.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+</head>
+<body>
+    <!-- Custom Cursor Element -->
+    <div class="custom-cursor" id="customCursor"></div>
+
+    <!-- Advertisements on the Left and Right Side -->
+    <div class="ads-container">
+        <div class="ads-left">
+            <img id="left1" src="ad1.png" alt="Advertisement 1" onclick="window.location.href='ad1.html';" tabindex="0" role="button" aria-label="Navigate to Advertisement 1">
+            <img id="left2" src="ad3.png" alt="Advertisement 3" onclick="window.location.href='ad3.html';" tabindex="0" role="button" aria-label="Navigate to Advertisement 3">
+            <img id="left3" src="ad5.png" alt="Advertisement 5" onclick="window.location.href='ad5.html';" tabindex="0" role="button" aria-label="Navigate to Advertisement 5">
+            <img id="left4" src="ad7.png" alt="Advertisement 7" onclick="window.location.href='ad7.html';" tabindex="0" role="button" aria-label="Navigate to Advertisement 7">
+        </div>
+
+        <div class="ads-right">
+            <img id="right1" src="ad2.png" alt="Advertisement 2" onclick="window.location.href='ad2.html';" tabindex="0" role="button" aria-label="Navigate to Advertisement 2">
+            <img id="right2" src="ad4.png" alt="Advertisement 4" onclick="window.location.href='ad4.html';" tabindex="0" role="button" aria-label="Navigate to Advertisement 4">
+            <img id="right3" src="ad6.png" alt="Advertisement 6" onclick="window.location.href='ad6.html';" tabindex="0" role="button" aria-label="Navigate to Advertisement 6">
+            <img id="right4" src="ad8.png" alt="Advertisement 8" onclick="window.location.href='ad8.html';" tabindex="0" role="button" aria-label="Navigate to Advertisement 8">
+        </div>
+    </div>
+
+    <!-- Header Section -->
+    <header>
+        <div class="logo">
+            <img src="turtle3.png" alt="Turtle Logo" class="logo-image">
+            GoGoTurtle
+        </div>
+        <nav class="nav" aria-label="Main Navigation">
+            <a href="#game1">Game 1</a>
+            <a href="#game2">Game 2</a>
+        </nav>
+    </header>
+
+    <!-- Main Banner Section -->
+    <div class="main-banner">
+        <!-- Banners Container -->
+        <div class="banners">
+            <!-- Banner 1 -->
+            <div class="banner-container">
+                <img src="banner1.1.png" alt="Main Banner - Learn About Gambling Risks" 
+                     class="active"
+                     loading="lazy" 
+                     onclick="window.location.href='banner1.1.html';" 
+                     tabindex="0" 
+                     role="button" 
+                     aria-label="Navigate to Main Banner Section">
+            </div>
+
+            <!-- Banner 2 -->
+            <div class="banner-container">
+                <img src="banner2.1.png" alt="Banner 2 - Success Stories" 
+                     class="active"
+                     loading="lazy" 
+                     onclick="window.location.href='banner2.1.html';" 
+                     tabindex="0" 
+                     role="button" 
+                     aria-label="Navigate to Success Stories Section">
+            </div>
+
+            <!-- Banner 3 -->
+            <div class="banner-container">
+                <img src="banner3.1.png" alt="Banner 3 - Support Resources" 
+                     class="active"
+                     loading="lazy" 
+                     onclick="window.location.href='banner3.1.html';" 
+                     tabindex="0" 
+                     role="button" 
+                     aria-label="Navigate to Support Resources Section">
+            </div>
+        </div>
+
+        <!-- Login Box -->
+        <div class="login-box">
+            <h3>Log In / Sign Up</h3>
+            <form id="loginForm">
+                <label for="userId" style="display:none;">Enter ID:</label>
+                <input type="text" id="userId" placeholder="Enter ID" required>
+                
+                <label for="password" style="display:none;">Enter Password:</label>
+                <input type="password" id="password" placeholder="Enter Password" required>
+                
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Game Section with "Click to Play" Button -->
+    <div class="game" tabindex="0" role="button" aria-label="Navigate to Race Game Section">
+        <img src="race.png" alt="Race Game Image" loading="lazy">
+        <button class="game-button" onclick="navigateToGame()">Click to Play</button>
+    </div>
+
+    <!-- Container for JS Output -->
+    <div id="jsOutputContainer"></div>
+
+    <!-- Information Sections -->
+    <div class="info">
+        <!-- Announcements Section -->
+        <div class="announcements">
+            <strong>Announcements</strong>
+            <div class="announcements-content">
+                <a href="#">GGT Check out our new domain!</a>
+                <a href="#">GGT Quick and easy loans!</a>
+                <a href="#">GGT No visit, no paperwork required!</a>
+                <a href="#">GGT Same-day loan approval!</a>
+                <a href="#">GGT Reduce your burden with low interest rates!</a>
+                <a href="#">GGT Limit checks are 100% free!</a>
+                <a href="#">GGT Customized loans based on your credit!</a>
+                <a href="#">GGT Instant solution when you need urgent cash!</a>
+                <a href="#">GGT Special Offer: 50% Discount!</a> <!-- Additional Content -->
+            </div>
+        </div>
+
+        <!-- Events Section -->
+        <div class="events">
+            <strong>Events</strong>
+            <div class="events-content">
+                <a href="#">GGT Daily Spin Fiesta!</a>
+                <a href="#">GGT VIP Jackpot Giveaway!</a>
+                <a href="#">GGT Holiday Jackpot Bonanza</a>
+                <a href="#">GGT Big Game Bet Challenge</a>
+                <a href="#">GGT 8 ball pin!</a>
+                <a href="#">GGT Texas Holdem</a>
+                <a href="#">GGT Spring Tournament</a> <!-- Additional Content -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Sponsors Section -->
+    <div class="sponsors">
+        <strong>Sponsors</strong>
+        <div>
+            <div>ROFFI</div>
+            <div>SOGANG</div>
+            <div>SYL</div>
+            <div>Seaturtles</div>
+            <div>KB</div>
+        </div>
+    </div>
+
+    <!-- Include the p5.js Game Script -->
+    <script>
+        /* ------------------------- Advertisement Rotation ------------------------- */
+        // Define the ad array
+        let ads = [
+            { src: 'ad1.png', href: 'ad1.html' },
+            { src: 'ad2.png', href: 'ad2.html' },
+            { src: 'ad3.png', href: 'ad3.html' },
+            { src: 'ad4.png', href: 'ad4.html' },
+            { src: 'ad5.png', href: 'ad5.html' },
+            { src: 'ad6.png', href: 'ad6.html' },
+            { src: 'ad7.png', href: 'ad7.html' },
+            { src: 'ad8.png', href: 'ad8.html' }
+        ];
+
+        // Select ad slots in order: left1, right1, left2, right2, left3, right3, left4, right4
+        const adSlots = [
+            document.getElementById('left1'),
+            document.getElementById('right1'),
+            document.getElementById('left2'),
+            document.getElementById('right2'),
+            document.getElementById('left3'),
+            document.getElementById('right3'),
+            document.getElementById('left4'),
+            document.getElementById('right4')
+        ];
+
+        // Assign initial images to ad slots
+        adSlots.forEach((img, index) => {
+            img.src = ads[index].src;
+            img.alt = `Advertisement ${index + 1}`;
+            img.onclick = function() {
+                window.location.href = ads[index].href;
+            };
+        });
+
+        // Function to rotate ads
+        function rotateAds() {
+            // Rotate the ads array: move last ad to first position
+            const lastAd = ads.pop();
+            ads.unshift(lastAd);
+
+            // Add blink class to all ad slots
+            adSlots.forEach(img => img.classList.add('blink'));
+
+            // After blink animation duration, update the ads
+            setTimeout(() => {
+                adSlots.forEach((img, index) => {
+                    img.src = ads[index].src;
+                    img.alt = `Advertisement ${index + 1}`;
+                    img.onclick = function() {
+                        window.location.href = ads[index].href;
+                    };
+                    img.classList.remove('blink');
+                });
+            }, 500); // Duration matches the blink animation (0.5s)
+        }
+
+        // Start rotating ads every 3 seconds
+        setInterval(rotateAds, 3000);
+
+        // Function to stop ads movement after 30 seconds
+        function stopAdsMovement() {
+            const adsElements = document.querySelectorAll('.ads-left img, .ads-right img');
+            adsElements.forEach(ad => {
+                ad.style.animationPlayState = 'paused';
+            });
+        }
+
+        // Call the function after 30 seconds (30000 milliseconds)
+        setTimeout(stopAdsMovement, 30000);
+
+        /* ------------------------- JS Output Container Initialization ------------------------- */
+        const jsOutputContainer = document.getElementById('jsOutputContainer');
+        jsOutputContainer.innerHTML = "<p>Welcome to the GoGoTurtle game! Earn easy money on GoGoTurtle! Stay tuned for updates!</p>";
+
+        /* ------------------------- Form Validation ------------------------- */
+        const form = document.getElementById('loginForm');
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const userId = document.getElementById('userId').value.trim();
+            const password = document.getElementById('password').value.trim();
+            
+            if (userId === '' || password === '') {
+                jsOutputContainer.innerHTML = "<p style='color: red;'>Please fill in all fields.</p>";
+            } else {
+                // Handle form submission (e.g., send data to server)
+                jsOutputContainer.innerHTML = `<p>Login successful! Welcome, ${userId}.</p>`;
+            }
+        });
+
+        /* ------------------------- Interactive Elements: Warning on Game Button Click ------------------------- */
+        const gameButton = document.querySelector('.game-button');
+        gameButton.addEventListener('click', function(event) {
+            event.preventDefault();
+            const proceed = confirm('Are you sure you want to proceed to the game? Remember, gambling can be addictive and harmful.');
+            if (proceed) {
+                window.location.href = 'gogoturtle2.html';
+            }
+        });
+
+        /* ------------------------- Keyboard Accessibility for Banners ------------------------- */
+        document.querySelectorAll('.banner-container img').forEach(img => {
+            img.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    img.click();
+                }
+            });
+        });
+
+        /* ------------------------- Keyboard Accessibility for Game Button ------------------------- */
+        gameButton.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                gameButton.click();
+            }
+        });
+
+        /* ------------------------- Rotating Banners Functionality ------------------------- */
+        const banner1 = document.querySelectorAll('.banner-container img')[0];
+        const banner2 = document.querySelectorAll('.banner-container img')[1];
+        const banner3 = document.querySelectorAll('.banner-container img')[2];
+
+        setInterval(() => {
+            // Store current srcs
+            const tempSrc1 = banner1.getAttribute('src');
+            const tempAlt1 = banner1.getAttribute('alt');
+            const tempHref1 = banner1.getAttribute('onclick');
+
+            const tempSrc2 = banner2.getAttribute('src');
+            const tempAlt2 = banner2.getAttribute('alt');
+            const tempHref2 = banner2.getAttribute('onclick');
+
+            const tempSrc3 = banner3.getAttribute('src');
+            const tempAlt3 = banner3.getAttribute('alt');
+            const tempHref3 = banner3.getAttribute('onclick');
+
+            // Rotate srcs
+            banner1.setAttribute('src', tempSrc3);
+            banner1.setAttribute('alt', tempAlt3);
+            banner1.setAttribute('onclick', tempHref3);
+
+            banner3.setAttribute('src', tempSrc2);
+            banner3.setAttribute('alt', tempAlt2);
+            banner3.setAttribute('onclick', tempHref2);
+
+            banner2.setAttribute('src', tempSrc1);
+            banner2.setAttribute('alt', tempAlt1);
+            banner2.setAttribute('onclick', tempHref1);
+        }, 3000); // Change every 3000ms (3 seconds);
+
+        /* ------------------------- Function to Navigate to Game ------------------------- */
+        function navigateToGame() {
+            const proceed = confirm('Are you sure you want to proceed to the game? Remember, gambling can be addictive and harmful.');
+            if (proceed) {
+                window.location.href = 'gogoturtle2.html';
+            }
+        }
+
+        /* ------------------------- Custom Cursor Functionality ------------------------- */
+        (function() {
+            const customCursor = document.getElementById('customCursor');
+
+            // Update cursor position on mouse move
+            document.addEventListener('mousemove', (e) => {
+                customCursor.style.left = `${e.clientX}px`;
+                customCursor.style.top = `${e.clientY}px`;
+            });
+
+            // Optional: Hide custom cursor when over interactive elements
+            const interactiveElements = document.querySelectorAll('a, button, input, textarea, select, .game-button, .nav a');
+            interactiveElements.forEach(el => {
+                el.addEventListener('mouseenter', () => {
+                    customCursor.style.display = 'none';
+                });
+                el.addEventListener('mouseleave', () => {
+                    customCursor.style.display = 'block';
+                });
+            });
+
+            // Optional: Handle touch devices by hiding the custom cursor
+            if ('ontouchstart' in window || navigator.maxTouchPoints) {
+                customCursor.style.display = 'none';
+            }
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoGoTurtle Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000; /* Black background */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 50vh;
+            overflow: hidden;
+            position: relative; /* To contain fixed elements */
+        }
+
+        /* New Styles for Side Ads */
+        .side-ads {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1000; /* Ensure ads are above other elements */
+        }
+
+        .left-ads {
+            left: 10px; /* Adjust as needed */
+        }
+
+        .right-ads {
+            right: 10px; /* Adjust as needed */
+        }
+
+        .side-ads img {
+            width: 100px; /* Adjust size as needed */
+            height: auto;
+            cursor: pointer;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 5px;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .side-ads img:hover {
+            transform: scale(1.1);
+            border-color: rgba(255, 255, 255, 1);
+        }
+
+        .banner-row {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .banner-row img {
+            width: 200px;
+            height: auto;
+            cursor: pointer;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 5px;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .banner-row img:hover {
+            transform: scale(1.1);
+            border-color: rgba(255, 255, 255, 1);
+        }
+
+        .bet-text {
+            color: #ffffff;
+            font-size: 24px;
+            margin: 10px 0 20px;
+            text-align: center;
+        }
+
+        .game {
+            width: 0%;
+            max-width: 400px;
+            height: 80%;
+            max-height: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(0, 0, 0, 0.75);
+            border-radius: 10px;
+        }
+
+        .shell-counter {
+            color: #fff;
+            font-size: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .footer {
+            opacity: 0; /* Fully transparent initially */
+            transition: opacity 1s ease-in-out; /* Smooth transition */
+            color: #d40000;
+            font-size: 16px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .footer.visible {
+            opacity: 1; /* Fully visible when 'visible' class is added */
+        }
+
+        canvas {
+            display: block;
+            margin: auto;
+        }
+    </style>
+    <!-- Include p5.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+</head>
+<body>
+    <!-- Left Side Ads -->
+    <div class="side-ads left-ads">
+        <a href="https://example.com/ad1"><img src="ad1.png" alt="Ad 1"></a>
+        <a href="https://example.com/ad2"><img src="ad2.png" alt="Ad 2"></a>
+        <a href="https://example.com/ad3"><img src="ad3.png" alt="Ad 3"></a>
+        <a href="https://example.com/ad4"><img src="ad4.png" alt="Ad 4"></a>
+    </div>
+
+    <!-- Right Side Ads -->
+    <div class="side-ads right-ads">
+        <a href="https://example.com/ad5"><img src="ad5.png" alt="Ad 5"></a>
+        <a href="https://example.com/ad6"><img src="ad6.png" alt="Ad 6"></a>
+        <a href="https://example.com/ad7"><img src="ad7.png" alt="Ad 7"></a>
+        <a href="https://example.com/ad8"><img src="ad8.png" alt="Ad 8"></a>
+    </div>
+
+    <div class="banner-row">
+        <a href="gogoturtle.html"><img src="banner1.1.png" alt="Banner 1"></a>
+        <a href="gogoturtle.html"><img src="banner1.1.png" alt="Banner 2"></a>
+        <a href="gogoturtle.html"><img src="banner1.1.png" alt="Banner 3"></a>
+        <a href="gogoturtle.html"><img src="banner1.1.png" alt="Banner 4"></a>
+    </div>
+
+    <div class="bet-text">Bet on a turtle!!</div>
+
+    <div class="game" id="gameContainer"></div>
+
+    <div class="footer">
+        Time spent: <span id="timeCounter">0</span> seconds | Clicks: <span id="clickCounter">0</span>
+    </div>
+
+    <script>
+        let timeSpent = 0;
+        let clickCount = 0;
+
+        function updateCounters() {
+            document.getElementById('timeCounter').textContent = timeSpent;
+            document.getElementById('clickCounter').textContent = clickCount;
+        }
+
+        // Increment time every second
+        setInterval(() => {
+            timeSpent++;
+            updateCounters();
+        }, 1000);
+
+        // Increment click count on click
+        document.body.addEventListener('click', () => {
+            clickCount++;
+            updateCounters();
+        });
+
+        // Function to add the 'visible' class to the footer after 8 seconds
+        function showFooter() {
+            const footer = document.querySelector('.footer');
+            footer.classList.add('visible');
+        }
+
+        // Set a timeout to show the footer after 8000 milliseconds (8 seconds)
+        setTimeout(showFooter, 10000);
+
+        // Initial update
+        updateCounters();
+    </script>
+    <script src="GoGoTurtle.js"></script>
+</body>
+</html>
